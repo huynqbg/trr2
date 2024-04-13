@@ -4,16 +4,10 @@
 
 using namespace std;
 
-int n, chuaxet[100], a[100][100];
-
-void reInit() {
-	for(int i=1; i<=n; i++){
-		chuaxet[i] = true;
-	}
-}
+int n, s, t, chuaxet[100], truoc[100], a[100][100];
 
 void readData() {
-    cin >> n;
+    cin >> n >> s >> t;
     for(int i=1; i<=n; i++) {
         for(int j=1; j<=n; j++) {
             cin >> a[i][j];
@@ -25,38 +19,65 @@ void dfs(int u) {
     chuaxet[u] = false;
     for(int v=1; v<=n; v++) {
         if(chuaxet[v] && a[u][v]) {
+            truoc[v] = u;
             dfs(v);
         }
     }
 }
 
-int test() {
-	for(int u=1; u<=n; u++) {
-		if (chuaxet[u]) return 1;
-	}
-	return 0;
+void bfs(int u) {
+    queue<int> q;
+    chuaxet[u] = false;
+    q.push(u);
+    while(!q.empty()) {
+        int v = q.front();
+        q.pop();
+        for(int t=1; t<=n; t++) {
+            if(chuaxet[t] && a[v][t]) {
+                q.push(t);
+                truoc[t] = v;
+                chuaxet[t] = false;
+            }
+        }
+    }
 }
 
-int stronglyConnected() {
-	readData();
-	reInit();
-	for(int u=1; u<=n; u++) {
-		chuaxet[u] = false;
-		if (u==1) dfs(2);
-		else dfs(1);
-		if(test()) return 0;
-		reInit();
-	}
-	return 1;
+void pathDFS(int s, int t) {
+    memset(chuaxet, true, sizeof(chuaxet));
+    memset(truoc, 0, sizeof(truoc));
+    dfs(s);
+    if(truoc[t]==0) {
+        cout << "no path";
+    } else {
+        cout << "DFS path: " << t << " ";
+        int u = truoc[t];
+        while(u!=s) {
+            cout << u << " ";
+            u = truoc[u];
+        }
+        cout << s;
+    }
+}
+
+void pathBFS(int s, int t) {
+    memset(chuaxet, true, sizeof(chuaxet));
+    memset(truoc, 0, sizeof(truoc));
+    bfs(s);
+    if (truoc[t] != 0) {
+        cout << "BFS path: " << t << " ";
+        int u = truoc[t];
+        while(u!=s) {
+            cout << u << " ";
+            u = truoc[u];
+        }
+        cout << s;
+    }
 }
 
 int main() {
-    if(stronglyConnected()) cout << "strongly connected";
-    else cout << "not strongly connected";
+    readData();
+    pathDFS(s, t);
+    cout << endl;
+    pathBFS(s, t);
     return 0;
 }
-
-
-
-
-
